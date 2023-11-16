@@ -69,4 +69,15 @@ set_target_properties(tams_glass_calibrate PROPERTIES OUTPUT_NAME calibrate PREF
 
 add_executable(tams_glass_reconstruct src/reconstruct.cpp)
 add_dependencies(tams_glass_reconstruct ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(tams_glass_reconstruct yaml-cpp ${ca
+target_link_libraries(tams_glass_reconstruct yaml-cpp ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS})
+set_target_properties(tams_glass_reconstruct PROPERTIES OUTPUT_NAME reconstruct PREFIX "")
+
+add_executable(tams_glass_opaque src/opaque.cpp)
+add_dependencies(tams_glass_opaque ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(tams_glass_opaque yaml-cpp ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS})
+set_target_properties(tams_glass_opaque PROPERTIES OUTPUT_NAME opaque PREFIX "")
+
+add_executable(tams_glass_poses src/poses.cpp)
+add_dependencies(tams_glass_poses ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(tams_glass_poses yaml-cpp ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS})
+set_target_properties(tams_glass_poses PROPERTIES OUTPUT_NAME poses PREFIX
