@@ -80,4 +80,4 @@ set_target_properties(tams_glass_opaque PROPERTIES OUTPUT_NAME opaque PREFIX "")
 add_executable(tams_glass_poses src/poses.cpp)
 add_dependencies(tams_glass_poses ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(tams_glass_poses yaml-cpp ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS})
-set_target_properties(tams_glass_poses PROPERTIES OUTPUT_NAME poses PREFIX
+set_target_properties(tams_glass_poses PROPERTIES OUTPUT_NAME poses PREFIX "")
