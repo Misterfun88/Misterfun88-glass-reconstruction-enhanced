@@ -60,3 +60,28 @@ int main(int argc, char **argv) {
   sensor_msgs::CameraInfo::Ptr camera_info;
 
   {
+    rosbag::Bag bag;
+    bag.open(argv[1], rosbag::bagmode::Read);
+    ros::Time last_time = ros::Time(0);
+    cv::Mat image_accumulator;
+    sensor_msgs::JointState last_joint_state, image_joint_state;
+
+    auto processImage = [&](cv::Mat image) {
+      double lo, hi;
+      cv::minMaxIdx(image, &lo, &hi);
+      image = image * (254.0 / hi);
+      image.convertTo(image, CV_8U);
+
+      image_size = cv::Size(image.cols, image.rows);
+
+      std::vector<cv::Point2f> chessboard_corners;
+      bool chessboard_found = cv::findChessboardCorners(
+          image, chessboard_size, chessboard_corners,
+          cv::CALIB_CB_FAST_CHECK | cv::CALIB_CB_FILTER_QUADS);
+      if (!chessboard_found) {
+        ROS_INFO_STREAM("no chessboard found in image");
+        return;
+      }
+
+      cv::cornerSubPix(
+          
