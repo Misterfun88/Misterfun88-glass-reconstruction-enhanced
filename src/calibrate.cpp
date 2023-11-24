@@ -109,4 +109,29 @@ int main(int argc, char **argv) {
         return -1;
       }
 
-      if (bag_message.getTopic() == "/joint_state
+      if (bag_message.getTopic() == "/joint_states") {
+        if (auto joint_state_message =
+                bag_message.instantiate<sensor_msgs::JointState>()) {
+          last_joint_state = *joint_state_message;
+        }
+      }
+
+      if (bag_message.getTopic() == camera_info_topic) {
+        if (!camera_info) {
+          if (auto camera_info_msg =
+                  bag_message.instantiate<sensor_msgs::CameraInfo>()) {
+            camera_info =
+                boost::make_shared<sensor_msgs::CameraInfo>(*camera_info_msg);
+          }
+        }
+      }
+
+      if (bag_message.getTopic() == camera_image_topic) {
+        if (auto image_message =
+                bag_message.instantiate<sensor_msgs::Image>()) {
+
+          ros::Time image_time = image_message->header.stamp;
+
+          auto cv_image = cv_bridge::toCvCopy(image_message);
+
+          cv::M
