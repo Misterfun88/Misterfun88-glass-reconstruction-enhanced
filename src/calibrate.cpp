@@ -31,4 +31,32 @@ int main(int argc, char **argv) {
 
   moveit::core::RobotState robot_state = *move_group.getCurrentState();
 
-  cv:
+  cv::Size chessboard_size(5, 4);
+  double scale = 0.0245;
+
+  std::vector<cv::Point3f> corners3d;
+  for (int i = 0; i < chessboard_size.height; i++) {
+    for (int j = 0; j < chessboard_size.width; j++) {
+      corners3d.emplace_back(j * scale, i * scale, 0);
+    }
+  }
+
+  std::vector<std::vector<cv::Point3f>> c3d;
+  std::vector<std::vector<cv::Point2f>> c2d;
+
+  std::vector<sensor_msgs::JointState> joint_states;
+
+  cv::Size image_size;
+
+  ros::Publisher display_planned_path =
+      node.advertise<moveit_msgs::DisplayTrajectory>(
+          "/move_group/display_planned_path", 1, true);
+
+  ros::Publisher vis_pub = node.advertise<visualization_msgs::MarkerArray>(
+      "/tams_glass/visualization", 10);
+
+  ROS_INFO_STREAM("reading and analyzing images");
+
+  sensor_msgs::CameraInfo::Ptr camera_info;
+
+  {
