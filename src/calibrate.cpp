@@ -84,4 +84,29 @@ int main(int argc, char **argv) {
       }
 
       cv::cornerSubPix(
-          
+          image, chessboard_corners, cv::Size(5, 5), cv::Size(-1, -1),
+          cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+
+      c2d.emplace_back(chessboard_corners);
+      c3d.emplace_back(corners3d);
+
+      joint_states.emplace_back(image_joint_state);
+
+      cv::drawChessboardCorners(image, chessboard_size, chessboard_corners,
+                                true);
+
+      cv::circle(image, chessboard_corners[0], 15, cv::Scalar(255));
+      cv::circle(image, chessboard_corners[1], 10, cv::Scalar(255));
+
+      cv::imshow("image", image);
+      cv::waitKey(1);
+    };
+
+    for (const rosbag::MessageInstance &bag_message : rosbag::View(bag)) {
+
+      if (!ros::ok()) {
+        ROS_ERROR_STREAM("canceled");
+        return -1;
+      }
+
+      if (bag_message.getTopic() == "/joint_state
