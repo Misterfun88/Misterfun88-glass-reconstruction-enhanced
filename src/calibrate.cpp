@@ -134,4 +134,34 @@ int main(int argc, char **argv) {
 
           auto cv_image = cv_bridge::toCvCopy(image_message);
 
-          cv::M
+          cv::Mat image = cv_image->image;
+
+          if (image.channels() > 1) {
+            cv::cvtColor(image, image, CV_BGR2GRAY);
+          }
+
+          image.convertTo(image, CV_32FC1);
+
+          if ((image_time - last_time).toSec() > 0.5 &&
+              image_accumulator.rows != 0 && image_accumulator.cols != 0) {
+            processImage(image_accumulator);
+            image_accumulator = cv::Mat();
+          }
+
+          if (image_accumulator.rows == 0 || image_accumulator.cols == 0) {
+            image_accumulator = image;
+          } else {
+            image_accumulator += image;
+          }
+          image_joint_state = last_joint_state;
+
+          last_time = image_time;
+        }
+      }
+    }
+  }
+
+  ROS_INFO_STREAM("display robot states");
+  {
+    ros::Duration(0.1).sleep();
+    moveit_msgs::Di
