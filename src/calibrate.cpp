@@ -164,4 +164,24 @@ int main(int argc, char **argv) {
   ROS_INFO_STREAM("display robot states");
   {
     ros::Duration(0.1).sleep();
-    moveit_msgs::Di
+    moveit_msgs::DisplayTrajectory msg;
+    for (auto &state : joint_states) {
+      msg.trajectory.emplace_back();
+      msg.trajectory.back().joint_trajectory.joint_names = state.name;
+      msg.trajectory.back().joint_trajectory.points.emplace_back();
+      msg.trajectory.back().joint_trajectory.points.back().positions =
+          state.position;
+    }
+    msg.trajectory_start.joint_state = joint_states.front();
+    display_planned_path.publish(msg);
+    ros::Duration(0.1).sleep();
+  }
+
+  if (0) {
+    ROS_INFO_STREAM("calibrating intrinsics");
+    cv::Mat camera_matrix, dist_coeffs, tvec, rvec;
+    double err = cv::calibrateCamera(c3d, c2d, image_size, camera_matrix,
+                                     dist_coeffs, tvec, rvec);
+    ROS_INFO_STREAM("ready");
+    ROS_INFO_STREAM("average reprojection error: " << err);
+    ROS_INFO_STREAM("camera m
