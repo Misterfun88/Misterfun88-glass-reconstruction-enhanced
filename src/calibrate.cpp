@@ -184,4 +184,25 @@ int main(int argc, char **argv) {
                                      dist_coeffs, tvec, rvec);
     ROS_INFO_STREAM("ready");
     ROS_INFO_STREAM("average reprojection error: " << err);
-    ROS_INFO_STREAM("camera m
+    ROS_INFO_STREAM("camera matrix\n" << camera_matrix);
+    ROS_INFO_STREAM("distortion coefficients\n" << dist_coeffs);
+    ROS_INFO_STREAM("translation vectors\n" << tvec);
+    ROS_INFO_STREAM("rotation vectors\n" << rvec);
+
+    camera_info->D.resize(dist_coeffs.rows * dist_coeffs.cols);
+    for (size_t i = 0; i < dist_coeffs.rows * dist_coeffs.cols; i++) {
+      camera_info->D[i] = dist_coeffs.at<double>(i);
+    }
+
+    for (int row = 0; row < 3; row++) {
+      for (int col = 0; col < 3; col++) {
+        ASSERT(row < camera_matrix.rows);
+        ASSERT(col < camera_matrix.cols);
+        camera_info->P[row * 4 + col] = camera_matrix.at<double>(row, col);
+        camera_info->K[row * 3 + col] = camera_matrix.at<double>(row, col);
+      }
+    }
+  }
+
+  image_geometry::PinholeCameraModel camera;
+  if (!camera.fromCam
