@@ -205,4 +205,37 @@ int main(int argc, char **argv) {
   }
 
   image_geometry::PinholeCameraModel camera;
-  if (!camera.fromCam
+  if (!camera.fromCameraInfo(camera_info)) {
+    ROS_ERROR_STREAM("failed to load camera info");
+    return -1;
+  }
+
+  struct Solution : Calibration {
+    double scale = 1.0;
+  };
+
+  Solution solution;
+  Solution temp_solution;
+
+  solution.base_to_object = solution.base_to_object *
+                            Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitX());
+  solution.base_to_object =
+      solution.base_to_object *
+      Eigen::AngleAxisd(M_PI / -2, Eigen::Vector3d::UnitZ());
+
+  solution.tip_to_camera =
+      solution.tip_to_camera *
+      Eigen::AngleAxisd(M_PI / -2, Eigen::Vector3d::UnitZ());
+
+  if (1) {
+    solution.tip_to_camera = Eigen::Isometry3d::Identity();
+  }
+
+  for (size_t iteration = 0; iteration < 500; iteration++) {
+
+    if (!ros::ok()) {
+      ROS_ERROR_STREAM("canceled");
+      return -1;
+    }
+
+    ROS_INFO_STREAM("iteration " << ite
