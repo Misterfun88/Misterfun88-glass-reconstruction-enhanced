@@ -238,4 +238,30 @@ int main(int argc, char **argv) {
       return -1;
     }
 
-    ROS_INFO_STREAM("iteration " << ite
+    ROS_INFO_STREAM("iteration " << iteration);
+
+    size_t variable_count = 13;
+
+    auto applyGradients = [&](const Eigen::VectorXd &gradients,
+                              Solution &solution) {
+
+      if (iteration > 200) {
+        solution.tip_to_camera.translation() += gradients.segment<3>(0);
+        solution.base_to_object.translation() += gradients.segment<3>(3);
+      }
+
+      {
+        Eigen::Vector3d rotation = gradients.segment<3>(6);
+        if (rotation.squaredNorm()) {
+          solution.tip_to_camera =
+              solution.tip_to_camera *
+              Eigen::AngleAxisd(rotation.norm(), rotation.normalized());
+        }
+      }
+
+      if (iteration > 100) {
+        Eigen::Vector3d rotation = gradients.segment<3>(9);
+        if (rotation.squaredNorm()) {
+          solution.base_to_object =
+              solution.base_to_object *
+              Eigen::AngleAxisd(rotation.norm(), rotation
