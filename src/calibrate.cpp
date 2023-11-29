@@ -264,4 +264,30 @@ int main(int argc, char **argv) {
         if (rotation.squaredNorm()) {
           solution.base_to_object =
               solution.base_to_object *
-              Eigen::AngleAxisd(rotation.norm(), rotation
+              Eigen::AngleAxisd(rotation.norm(), rotation.normalized());
+        }
+      }
+
+    };
+
+    Eigen::VectorXd temp_variables(variable_count);
+
+    std::vector<Eigen::Triplet<double>> gradients;
+    std::vector<double> residuals;
+
+    visualization_msgs::Marker point_marker;
+    point_marker.type = visualization_msgs::Marker::SPHERE_LIST;
+    point_marker.action = visualization_msgs::Marker::ADD;
+    point_marker.header.frame_id = "/world";
+    point_marker.ns = "points";
+    point_marker.pose.orientation.w = 1.0;
+    point_marker.color.r = 1.0;
+    point_marker.color.g = 1.0;
+    point_marker.color.b = 1.0;
+    point_marker.color.a = 1.0;
+    point_marker.scale.x = 0.001;
+
+    visualization_msgs::Marker ray_marker;
+    ray_marker.type = visualization_msgs::Marker::LINE_LIST;
+    ray_marker.action = visualization_msgs::Marker::ADD;
+    
