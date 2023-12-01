@@ -335,4 +335,23 @@ int main(int argc, char **argv) {
           Eigen::Vector3d p2 = ray_origin + ray_dir;
 
           ray_marker.points.emplace_back();
-          ray_marker.points.back()
+          ray_marker.points.back().x = p1.x();
+          ray_marker.points.back().y = p1.y();
+          ray_marker.points.back().z = p1.z();
+
+          ray_marker.colors.emplace_back();
+          ray_marker.colors.back().r = ((point_index == 0) ? 1.0 : 0.0);
+          ray_marker.colors.back().g = ((point_index != 0) ? 1.0 : 0.0);
+          ray_marker.colors.back().b = 0;
+          ray_marker.colors.back().a = ((point_index == 0) ? 1.0 : 0.1);
+
+          ray_marker.points.emplace_back();
+          ray_marker.points.back().x = p2.x();
+          ray_marker.points.back().y = p2.y();
+          ray_marker.points.back().z = p2.z();
+
+          ray_marker.colors.emplace_back();
+          ray_marker.colors.back().r = ((point_index == 0) ? 1.0 : 0.0);
+          ray_marker.colors.back().g = ((point_index != 0) ? 1.0 : 0.0);
+          ray_marker.colors.back().b = 0;
+         
