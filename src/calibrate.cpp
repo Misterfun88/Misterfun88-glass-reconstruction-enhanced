@@ -290,4 +290,26 @@ int main(int argc, char **argv) {
     visualization_msgs::Marker ray_marker;
     ray_marker.type = visualization_msgs::Marker::LINE_LIST;
     ray_marker.action = visualization_msgs::Marker::ADD;
-    
+    ray_marker.header.frame_id = "/world";
+    ray_marker.ns = "rays";
+    ray_marker.pose.orientation.w = 1.0;
+    ray_marker.color.r = 1.0;
+    ray_marker.color.g = 1.0;
+    ray_marker.color.b = 1.0;
+    ray_marker.color.a = 0.1;
+    ray_marker.scale.x = 0.002;
+
+    for (size_t frame_index = 0; frame_index < c3d.size(); frame_index++) {
+
+      auto &joint_state = joint_states[frame_index];
+      for (size_t i = 0; i < joint_state.name.size(); i++) {
+        robot_state.setVariablePosition(joint_state.name[i],
+                                        joint_state.position[i]);
+      }
+      robot_state.update(true);
+      robot_state.updateLinkTransforms();
+
+      auto &tip_pose = robot_state.getFrameTransform(tip_link);
+      auto &base_pose = robot_state.getFrameTransform(base_link);
+
+      for (size_t point_index = 0; point_index < 
