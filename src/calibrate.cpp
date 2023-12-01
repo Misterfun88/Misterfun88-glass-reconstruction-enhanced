@@ -354,4 +354,25 @@ int main(int argc, char **argv) {
           ray_marker.colors.back().r = ((point_index == 0) ? 1.0 : 0.0);
           ray_marker.colors.back().g = ((point_index != 0) ? 1.0 : 0.0);
           ray_marker.colors.back().b = 0;
-         
+          ray_marker.colors.back().a = ((point_index == 0) ? 1.0 : 0.1);
+        }
+
+        {
+          Eigen::Vector3d pos =
+              base_pose * solution.base_to_object * edge_position;
+
+          point_marker.points.emplace_back();
+          point_marker.points.back().x = pos.x();
+          point_marker.points.back().y = pos.y();
+          point_marker.points.back().z = pos.z();
+
+          point_marker.colors.emplace_back();
+          point_marker.colors.back().r = ((point_index == 0) ? 1.0 : 0.0);
+          point_marker.colors.back().g = ((point_index != 0) ? 1.0 : 0.0);
+          point_marker.colors.back().b = 0;
+          point_marker.colors.back().a = 1;
+        }
+
+        double maxReprojectionError = 0.01;
+        auto evaluate = [&](const Solution &solution) {
+          Eigen::
