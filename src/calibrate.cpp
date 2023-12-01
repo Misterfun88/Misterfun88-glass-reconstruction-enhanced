@@ -312,4 +312,27 @@ int main(int argc, char **argv) {
       auto &tip_pose = robot_state.getFrameTransform(tip_link);
       auto &base_pose = robot_state.getFrameTransform(base_link);
 
-      for (size_t point_index = 0; point_index < 
+      for (size_t point_index = 0; point_index < c3d[frame_index].size();
+           point_index++) {
+
+        auto cv2d = c2d[frame_index][point_index];
+        auto cv3d = c3d[frame_index][point_index];
+
+        cv::Point3d p = camera.projectPixelTo3dRay(cv::Point2d(cv2d.x, cv2d.y));
+        Eigen::Vector3d cam_ray_direction =
+            Eigen::Vector3d(p.x, p.y, p.z).normalized();
+
+        Eigen::Vector3d edge_position(cv3d.x, cv3d.y, cv3d.z);
+
+        {
+          Eigen::Vector3d ray_origin =
+              (tip_pose * (solution.tip_to_camera * Eigen::Vector3d::Zero()));
+          Eigen::Vector3d ray_dir =
+              (tip_pose * (solution.tip_to_camera * cam_ray_direction)) -
+              ray_origin;
+
+          Eigen::Vector3d p1 = ray_origin;
+          Eigen::Vector3d p2 = ray_origin + ray_dir;
+
+          ray_marker.points.emplace_back();
+          ray_marker.points.back()
