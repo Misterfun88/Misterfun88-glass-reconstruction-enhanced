@@ -415,4 +415,26 @@ int main(int argc, char **argv) {
           residuals.emplace_back(error[i]);
         }
       }
- 
+    }
+
+    visualization_msgs::MarkerArray marker_array;
+    marker_array.markers.push_back(point_marker);
+    marker_array.markers.push_back(ray_marker);
+    vis_pub.publish(marker_array);
+
+    Eigen::SparseMatrix<double> gradient_matrix(residuals.size(),
+                                                variable_count);
+    gradient_matrix.setFromTriplets(gradients.begin(), gradients.end());
+
+    Eigen::VectorXd residual_vector(residuals.size());
+    for (size_t i = 0; i < residuals.size(); i++) {
+      residual_vector[i] = residuals[i];
+    }
+
+    ROS_INFO_STREAM("solving");
+    Eigen::LeastSquaresConjugateGradient<Eigen::SparseMatrix<double>> solver;
+    solver.compute(gradient_matrix);
+    Eigen::VectorXd solution_vector(variable_count);
+    solution_vector = solver.solve(residual_vector);
+
+  
