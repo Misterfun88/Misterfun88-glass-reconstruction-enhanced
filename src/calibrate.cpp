@@ -392,4 +392,27 @@ int main(int argc, char **argv) {
                              std::min(maxReprojectionError, err.y()));
           err.z() = std::min(0.0, err.z());
 
-          r
+          return err;
+        };
+
+        auto error = evaluate(solution);
+
+        for (size_t variable_index = 0; variable_index < variable_count;
+             variable_index++) {
+          const double delta = 0.00001;
+          temp_solution = solution;
+          temp_variables.setZero();
+          temp_variables[variable_index] -= delta;
+          applyGradients(temp_variables, temp_solution);
+          auto error2 = evaluate(temp_solution);
+          for (size_t i = 0; i < error.size(); i++) {
+            gradients.emplace_back(residuals.size() + i, variable_index,
+                                   (error2[i] - error[i]) / delta);
+          }
+        }
+
+        for (size_t i = 0; i < error.size(); i++) {
+          residuals.emplace_back(error[i]);
+        }
+      }
+ 
