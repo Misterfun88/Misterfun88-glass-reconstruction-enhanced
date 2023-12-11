@@ -375,4 +375,21 @@ int main(int argc, char **argv) {
 
         double maxReprojectionError = 0.01;
         auto evaluate = [&](const Solution &solution) {
-          Eigen::
+          Eigen::Vector3d pos = base_pose * (solution.base_to_object *
+                                             (edge_position * solution.scale));
+          pos = (tip_pose * solution.tip_to_camera).inverse() * pos;
+          pos = pos.normalized();
+
+          cv::Point3d cv_reprojected = camera.projectPixelTo3dRay(cv2d);
+          Eigen::Vector3d reprojected(cv_reprojected.x, cv_reprojected.y,
+                                      cv_reprojected.z);
+          reprojected = reprojected.normalized();
+
+          Eigen::Vector3d err = pos - reprojected;
+          err.x() = std::max(-maxReprojectionError,
+                             std::min(maxReprojectionError, err.x()));
+          err.y() = std::max(-maxReprojectionError,
+                             std::min(maxReprojectionError, err.y()));
+          err.z() = std::min(0.0, err.z());
+
+          r
