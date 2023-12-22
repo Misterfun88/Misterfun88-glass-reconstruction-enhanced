@@ -466,4 +466,27 @@ int main(int argc, char **argv) {
 
       out << YAML::Key << "position" << YAML::Value;
       out << YAML::BeginMap;
-      out << YAML::Key << "x" <<
+      out << YAML::Key << "x" << YAML::Value << pos.x();
+      out << YAML::Key << "y" << YAML::Value << pos.y();
+      out << YAML::Key << "z" << YAML::Value << pos.z();
+      out << YAML::EndMap;
+
+      out << YAML::Key << "orientation" << YAML::Value;
+      out << YAML::BeginMap;
+      out << YAML::Key << "x" << YAML::Value << quat.x();
+      out << YAML::Key << "y" << YAML::Value << quat.y();
+      out << YAML::Key << "z" << YAML::Value << quat.z();
+      out << YAML::Key << "w" << YAML::Value << quat.w();
+      out << YAML::EndMap;
+
+      out << YAML::EndMap;
+    };
+
+    YAML::Emitter out;
+    out << YAML::BeginMap;
+
+    out << YAML::Key << "tip_to_camera" << YAML::Value;
+    emitPose(out, solution.tip_to_camera);
+
+    out << YAML::Key << "base_to_object" << YAML::Value;
+    emitPose(out, solution.base_to_obj
