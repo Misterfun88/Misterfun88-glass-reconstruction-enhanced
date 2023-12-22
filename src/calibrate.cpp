@@ -437,4 +437,33 @@ int main(int argc, char **argv) {
     Eigen::VectorXd solution_vector(variable_count);
     solution_vector = solver.solve(residual_vector);
 
-  
+    applyGradients(solution_vector, solution);
+
+    ROS_INFO_STREAM("scale " << solution.scale);
+
+    ros::Duration(0.1).sleep();
+  }
+
+  if (ros::ok()) {
+
+    {
+      bool ok = camera_calibration_parsers::writeCalibrationYml(
+          ros::package::getPath("tams_glass") + "/config/" + name_prefix +
+              "camera.yaml",
+          "camera", camera.cameraInfo());
+      if (ok) {
+        ROS_INFO_STREAM("camera calibration saved");
+      } else {
+        ROS_ERROR_STREAM("failed to save camera calibration");
+        return -1;
+      }
+    }
+
+    auto emitPose = [](YAML::Emitter &out, const Eigen::Isometry3d &pose) {
+      Eigen::Vector3d pos = pose.translation();
+      Eigen::Quaterniond quat(pose.linear());
+      out << YAML::BeginMap;
+
+      out << YAML::Key << "position" << YAML::Value;
+      out << YAML::BeginMap;
+      out << YAML::Key << "x" <<
