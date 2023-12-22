@@ -489,4 +489,27 @@ int main(int argc, char **argv) {
     emitPose(out, solution.tip_to_camera);
 
     out << YAML::Key << "base_to_object" << YAML::Value;
-    emitPose(out, solution.base_to_obj
+    emitPose(out, solution.base_to_object);
+
+    out << YAML::EndSeq;
+    out << YAML::EndMap;
+    ROS_INFO_STREAM("results\n" << out.c_str());
+
+    std::string path = ros::package::getPath("tams_glass") + "/config/" +
+                       name_prefix + "calibration.yaml";
+    {
+      std::ofstream s(path);
+      s << out.c_str();
+      if (!s) {
+        ROS_ERROR_STREAM("failed to save results");
+      }
+    }
+    ROS_INFO_STREAM("saved to " << path);
+  } else {
+    ROS_ERROR_STREAM("aborted");
+    return -1;
+  }
+
+  ROS_INFO_STREAM("ready");
+  ros::Duration(1.0).sleep();
+}
