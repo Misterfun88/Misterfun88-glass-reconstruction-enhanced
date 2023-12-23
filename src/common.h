@@ -29,4 +29,26 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/point_cloud2_iterator.h>
 #include <sensor_msgs/point_cloud_conversion.h>
-#
+#include <tf/transform_broadcaster.h>
+#include <tf_conversions/tf_eigen.h>
+#include <visualization_msgs/MarkerArray.h>
+#include <yaml-cpp/yaml.h>
+
+struct Calibration {
+  Eigen::Isometry3d tip_to_camera = Eigen::Isometry3d::Identity();
+  Eigen::Isometry3d base_to_object = Eigen::Isometry3d::Identity();
+};
+
+#define ASSERT(x)                                                              \
+  if (!(x)) {                                                                  \
+    throw std::runtime_error(#x);                                              \
+  }
+
+void loadCalibration(Calibration &calibration, const std::string &path) {
+
+  YAML::Node data = YAML::LoadFile(path);
+
+  auto readPose = [&](YAML::Node node) {
+    Eigen::Isometry3d pose = Eigen::Isometry3d::Identity();
+
+    Eigen::Quaterniond quat = Eigen::Quaterniond::Identity();
