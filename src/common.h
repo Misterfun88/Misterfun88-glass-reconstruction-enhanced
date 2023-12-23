@@ -52,3 +52,23 @@ void loadCalibration(Calibration &calibration, const std::string &path) {
     Eigen::Isometry3d pose = Eigen::Isometry3d::Identity();
 
     Eigen::Quaterniond quat = Eigen::Quaterniond::Identity();
+    quat.x() = node["orientation"]["x"].as<double>();
+    quat.y() = node["orientation"]["y"].as<double>();
+    quat.z() = node["orientation"]["z"].as<double>();
+    quat.w() = node["orientation"]["w"].as<double>();
+
+    pose = Eigen::AngleAxisd(quat);
+
+    pose.translation().x() = node["position"]["x"].as<double>();
+    pose.translation().y() = node["position"]["y"].as<double>();
+    pose.translation().z() = node["position"]["z"].as<double>();
+
+    return pose;
+  };
+
+  calibration.tip_to_camera = readPose(data["tip_to_camera"]);
+  calibration.base_to_object = readPose(data["base_to_object"]);
+
+  ROS_INFO_STREAM("tip_to_camera\n" << calibration.tip_to_camera.matrix());
+  ROS_INFO_STREAM("base_to_object\n" << calibration.base_to_object.matrix());
+}
