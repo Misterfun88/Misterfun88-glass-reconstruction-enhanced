@@ -1187,3 +1187,51 @@ int main(int argc, char **argv) {
                 double goal = ref - voxel_grid.at(ix, iy, iz);
                 double weight = computeWeight(goal) * symmetry;
                 gradients.emplace_back(
+                    residuals.size(), voxel_grid.dataIndex(ix, iy, iz), weight);
+                residuals.emplace_back(goal * weight);
+              }
+            }
+          }
+        }
+      }
+
+      Eigen::SparseMatrix<Real> gradient_matrix(residuals.size(),
+                                                variable_count);
+      gradient_matrix.setFromTriplets(gradients.begin(), gradients.end());
+
+      Eigen::Matrix<Real, Eigen::Dynamic, 1> residual_vector(residuals.size());
+      for (size_t i = 0; i < residuals.size(); i++) {
+        residual_vector[i] = residuals[i];
+      }
+
+      ROS_INFO_STREAM(residual_vector.size() << " objectives");
+      ROS_INFO_STREAM(variable_count << " variables");
+
+      ROS_INFO_STREAM("solving");
+      Eigen::LeastSquaresConjugateGradient<Eigen::SparseMatrix<Real>> solver;
+      solver.setMaxIterations(20);
+      solver.compute(gradient_matrix);
+      Eigen::Matrix<Real, Eigen::Dynamic, 1> solution_vector(variable_count);
+
+      auto solve_begin_time = ros::Time::now();
+      solution_vector = solver.solve(residual_vector);
+      ROS_INFO_STREAM("solve time " << ros::Time::now() - solve_begin_time);
+
+      for (size_t iz = 0; iz < voxel_grid.size(); iz++) {
+        for (size_t iy = 0; iy < voxel_grid.size(); iy++) {
+          for (size_t ix = 0; ix < voxel_grid.size(); ix++) {
+            voxel_grid.at(ix, iy, iz) +=
+                solution_vector[voxel_grid.dataIndex(ix, iy, iz)];
+          }
+        }
+      }
+
+      ROS_INFO_STREAM("ready");
+
+      ROS_INFO_STREAM("outer iteration time "
+                      << ros::Time::now() - iteration_begin_time);
+
+      visualizeVoxelGrid(voxel_grid);
+    }
+  }
+}
