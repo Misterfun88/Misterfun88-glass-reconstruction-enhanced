@@ -28,4 +28,27 @@ int main(int argc, char **argv) {
 
   voxel_file.read((char *)&voxel_header, sizeof(voxel_header));
 
-  std::cout << "grid size " << v
+  std::cout << "grid size " << voxel_header.size_x << " " << voxel_header.size_y
+            << " " << voxel_header.size_z << std::endl;
+
+  if (voxel_header.size_x != voxel_header.size_y ||
+      voxel_header.size_y != voxel_header.size_z) {
+    throw std::runtime_error("currently only voxel cubes are supported");
+  }
+
+  VoxelGrid voxel_grid(grid_center, voxel_header.size_x, grid_resolution);
+
+  for (size_t iz = 0; iz < voxel_grid.size(); iz++) {
+    for (size_t iy = 0; iy < voxel_grid.size(); iy++) {
+      for (size_t ix = 0; ix < voxel_grid.size(); ix++) {
+        float v = 0.0f;
+        voxel_file.read((char *)&v, sizeof(v));
+        voxel_grid.at(ix, iy, iz) = v;
+      }
+    }
+  }
+
+  pcl::PointCloud<pcl::PointNormal>::Ptr cloud(
+      new pcl::PointCloud<pcl::PointNormal>);
+  for (size_t iz = 0; iz < voxel_grid.size(); iz++) {
+ 
