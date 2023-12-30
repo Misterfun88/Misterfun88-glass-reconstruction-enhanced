@@ -93,4 +93,29 @@ int main(int argc, char **argv) {
               std::array<double, (d + d + 1) * (d + d + 1) * (d + d + 1)>
                   sample_buffer;
               size_t sample_count = 0;
-     
+              for (int dz = -d; dz <= d; dz++) {
+                for (int dy = -d; dy <= d; dy++) {
+                  for (int dx = -d; dx <= d; dx++) {
+                    Eigen::Vector3i p(ix + dx, iy + dy, iz + dz);
+                    if (!voxel_grid.checkIndices(p)) {
+                      continue;
+                    }
+                    sample_buffer[sample_count] = voxel_grid.at(p);
+                    sample_count++;
+                  }
+                }
+              }
+              std::sort(sample_buffer.begin(),
+                        sample_buffer.begin() + sample_count);
+              double a = sample_buffer[sample_count / 2];
+
+              grid_[x * res_y_ * res_z_ + y * res_z_ + z] = mesh_threshold - a;
+
+            } else {
+              grid_[x * res_y_ * res_z_ + y * res_z_ + z] = 1.0;
+            }
+          }
+        }
+      }
+    }
+  };
