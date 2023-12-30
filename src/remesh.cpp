@@ -73,4 +73,24 @@ int main(int argc, char **argv) {
     const VoxelGrid &voxel_grid;
     MatchingCubesVoxelGrid(const VoxelGrid &voxel_grid)
         : voxel_grid(voxel_grid) {}
-    void voxelize
+    void voxelizeData() override {
+#pragma omp parallel for
+      for (int x = 0; x < res_x_; x++) {
+        for (int y = 0; y < res_y_; y++) {
+          for (int z = 0; z < res_z_; z++) {
+            Eigen::Vector3d point;
+            point[0] = min_p_[0] + (max_p_[0] - min_p_[0]) * x / res_x_;
+            point[1] = min_p_[1] + (max_p_[1] - min_p_[1]) * y / res_y_;
+            point[2] = min_p_[2] + (max_p_[2] - min_p_[2]) * z / res_z_;
+            Eigen::Vector3i index = voxel_grid.index(point);
+            if (voxel_grid.checkIndices(index)) {
+
+              int ix = index.x();
+              int iy = index.y();
+              int iz = index.z();
+
+              const int d = 1;
+              std::array<double, (d + d + 1) * (d + d + 1) * (d + d + 1)>
+                  sample_buffer;
+              size_t sample_count = 0;
+     
