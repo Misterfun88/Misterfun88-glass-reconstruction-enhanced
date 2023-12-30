@@ -119,3 +119,25 @@ int main(int argc, char **argv) {
       }
     }
   };
+
+  MatchingCubesVoxelGrid voxelizer(voxel_grid);
+  voxelizer.setGridResolution(voxel_grid.size(), voxel_grid.size(),
+                              voxel_grid.size());
+  voxelizer.setInputCloud(cloud);
+  voxelizer.setPercentageExtendGrid(0.0);
+  pcl::PointCloud<pcl::PointNormal> mesh_vertices;
+  std::vector<pcl::Vertices> mesh_polygons;
+  voxelizer.reconstruct(mesh_vertices, mesh_polygons);
+
+  {
+    std::ofstream stream(std::string() + argv[1] + ".mesh.obj");
+    for (auto &p : mesh_vertices) {
+      stream << "v " << p.x << " " << p.y << " " << p.z << "\n";
+    }
+    for (auto &polygon : mesh_polygons) {
+      stream << "f " << (polygon.vertices[0] + 1) << " "
+             << (polygon.vertices[1] + 1) << " " << (polygon.vertices[2] + 1)
+             << "\n";
+    }
+  }
+}
