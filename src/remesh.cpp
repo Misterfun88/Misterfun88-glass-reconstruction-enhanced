@@ -51,4 +51,26 @@ int main(int argc, char **argv) {
   pcl::PointCloud<pcl::PointNormal>::Ptr cloud(
       new pcl::PointCloud<pcl::PointNormal>);
   for (size_t iz = 0; iz < voxel_grid.size(); iz++) {
- 
+    for (size_t iy = 0; iy < voxel_grid.size(); iy++) {
+      for (size_t ix = 0; ix < voxel_grid.size(); ix++) {
+        if (ix == 0 || iy == 0 || iz == 0 || ix + 1 == voxel_grid.size() ||
+            iy + 1 == voxel_grid.size() || iz + 1 == voxel_grid.size()) {
+          Eigen::Vector3d pos = voxel_grid.position(ix, iy, iz);
+          pcl::PointNormal point;
+          point.x = pos.x();
+          point.y = pos.y();
+          point.z = pos.z();
+          point.normal_x = 0;
+          point.normal_y = 0;
+          point.normal_z = 1;
+          cloud->push_back(point);
+        }
+      }
+    }
+  }
+
+  struct MatchingCubesVoxelGrid : public pcl::MarchingCubes<pcl::PointNormal> {
+    const VoxelGrid &voxel_grid;
+    MatchingCubesVoxelGrid(const VoxelGrid &voxel_grid)
+        : voxel_grid(voxel_grid) {}
+    void voxelize
