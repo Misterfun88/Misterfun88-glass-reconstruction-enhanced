@@ -1,1 +1,3 @@
-# Enhanced Detection and Reconstruction of Transparent Objec
+# Enhanced Detection and Reconstruction of Transparent Objects with Infrared Projection-based RGB-D Cameras
+
+Robotic manipulation systems frequently utilize RGB-D cameras based on infrared projection to perceive three-dimensional environments. Unfortunately, this technique often fails on transparent objects such as glasses, bottles and plastic containers. This enhanced method exploits the perceived infrared camera images to detect and reconstruct volumetric shapes of arbitrary transparent objects. Our reconstruction pipeline first segments transparent surfaces based on pattern scattering and absorption, followed by optimization-based multi-view reconstruction of volumetric object models. Outputs from the segmentation stage can also be utilized for single-view transparent object detection. The presented methods improve on previous work by analyzing infrared camera images dir
